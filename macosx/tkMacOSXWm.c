@@ -3318,8 +3318,6 @@ WmStackorderCmd(
 	    Tcl_SetObjResult(interp, resultObj);
 	    ckfree(windows);
 	    return TCL_OK;
-	} else {
-	    return TCL_ERROR;
 	}
     } else {
 	TkWindow *winPtr2;
@@ -3391,6 +3389,7 @@ WmStackorderCmd(
 	Tcl_SetObjResult(interp, Tcl_NewBooleanObj(result));
 	return TCL_OK;
     }
+    return TCL_OK;
 }
 
 /*
@@ -6655,10 +6654,11 @@ TkWindow **
 TkWmStackorderToplevel(
     TkWindow *parentPtr)	/* Parent toplevel window. */
 {
-    TkWindow *childWinPtr, **windows, **windowPtr;
+    TkWindow **windows;
     Tcl_HashTable table;
     Tcl_HashEntry *hPtr;
     Tcl_HashSearch search;
+    int n;
 
     /*
      * Map mac windows to a TkWindow of the wrapped toplevel.
@@ -6692,15 +6692,14 @@ TkWmStackorderToplevel(
 	ckfree(windows);
 	windows = NULL;
     } else {
-	windowPtr = windows + table.numEntries;
-	*windowPtr-- = NULL;
+	n = 0;
 	for (NSWindow *w in macWindows) {
 	    hPtr = Tcl_FindHashEntry(&table, (char*) w);
 	    if (hPtr != NULL) {
-		childWinPtr = Tcl_GetHashValue(hPtr);
-		*windowPtr-- = childWinPtr;
+		windows[n++] = Tcl_GetHashValue(hPtr);
 	    }
 	}
+	windows[n] = NULL;
     }
 
   done:
