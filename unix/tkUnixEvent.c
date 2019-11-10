@@ -18,6 +18,8 @@
 #  define XkbOpenDisplay(D,V,E,M,m,R) ((V),(E),(M),(m),(R),(NULL))
 #endif
 
+#include <wayland-client.h>
+
 /*
  * The following static indicates whether this module has been initialized in
  * the current thread.
@@ -162,6 +164,15 @@ TkpOpenDisplay(
     */
     display = XkbOpenDisplay((char *)displayNameStr, &event, &error, &major,
 	    &minor, &reason);
+    
+    struct wl_display *display2 = wl_display_connect(NULL);
+    if (display == NULL) {
+            fprintf(stderr, "Cannot connect to Wayland server!\n");
+    }
+    else {
+            printf("Connected to Wayland server\n");
+    }
+    fflush(stdout);
 
     if (display == NULL) {
 	/*fprintf(stderr,"event=%d error=%d major=%d minor=%d reason=%d\nDisabling xkb\n",
